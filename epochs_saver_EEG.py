@@ -97,5 +97,5 @@ for run_idx in range(1, 11):
     # Function: Save epochs.
     # Output: None.
     '''
-    epochs.save(os.path.join(results_dir, 'eeg_mxl_epochs_%d-epo.fif' %
-                             run_idx), verbose=True)
+    epochs_shift.save(os.path.join(results_dir, 'eeg_mxl_epochs_%d-epo.fif' %
+                                   run_idx), verbose=True)
