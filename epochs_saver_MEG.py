@@ -25,7 +25,7 @@ if not os.path.exists(results_dir):
 '''
 file_dir = os.path.join(root_dir, 'rawdata', '20190326_RSVP_MEG_maxuelin',
                         'S02_lixiangTHU_20190326_%02d.ds')
-freq_l, freq_h = 0.1, 7  # Hz
+freq_l, freq_h = 0.5, 30  # Hz
 fir_design = 'firwin'
 
 for run_idx in range(4, 12):
