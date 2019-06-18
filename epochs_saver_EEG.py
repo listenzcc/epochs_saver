@@ -38,18 +38,31 @@ fir_design = 'firwin'
 motage = mne.channels.read_montage('standard_1020')
 
 
-def shift_events(events, raw, picks=[47], kernel=np.ones(100)):
+def shift_events(events, raw, ch_name='PZ', half_length=50):
+    kernel = np.concatenate(
+        [np.array(range(1, half_length)), np.array(range(half_length, 0, -1))])
+
+    picks = [raw.info['ch_names'].index(ch_name)]
+
     ts = np.squeeze(raw.get_data(picks=picks))
     ts_convolve = np.convolve(kernel, ts, 'same')
+
     new_events = events.copy()
     for j, onset in enumerate(events[:, 0]):
         ts_tmp = ts_convolve[onset+300: onset+400]
         maxidx = np.where(ts_tmp == ts_tmp.max())[0][0]
-        new_events[j, 0] = onset + maxidx
+
+        new_onset = onset + maxidx
+        while new_onset in new_events[0:j, 0]:
+            new_onset -= 1
+
+        new_events[j, 0] = new_onset
+
     return new_events
 
 
-def plot_epochs_PZ(epochs, picks=[47]):
+def plot_epochs_PZ(epochs, ch_name='PZ'):
+    picks = [epochs.info['ch_names'].index(ch_name)]
     mne.viz.plot_epochs_image(epochs, picks=picks, show=False)
 
 
@@ -74,28 +87,31 @@ for run_idx in range(1, 11):
 
     picks = mne.pick_types(raw.info, eeg=True, exclude='bads')
 
-    if False:
-        epochs = mne.Epochs(raw, picks=picks, events=events, event_id=event_id,
-                            tmin=tmin, tmax=tmax, baseline=None, detrend=1,
-                            reject=reject, preload=True)
+    epochs = mne.Epochs(raw, picks=picks, events=events, event_id=event_id,
+                        tmin=tmin, tmax=tmax, baseline=None, detrend=1,
+                        reject=reject, preload=True)
 
     epochs_shift = mne.Epochs(raw, picks=picks, event_id=event_id,
                               events=events_shift,
                               tmin=tmin, tmax=tmax, baseline=None, detrend=1,
                               reject=reject, preload=True)
 
-    if False:
+    show = False
+    if show:
         plot_epochs_PZ(epochs['odd'])
         plot_epochs_PZ(epochs_shift['odd'])
         plot_epochs_PZ(epochs['norm'])
         plot_epochs_PZ(epochs_shift['norm'])
         plt.show()
 
+    epochs.resample(freq_resample, npad='auto')
     epochs_shift.resample(freq_resample, npad='auto')
 
     '''
     # Function: Save epochs.
     # Output: None.
     '''
-    epochs_shift.save(os.path.join(results_dir, 'eeg_mxl_epochs_%d-epo.fif' %
+    epochs.save(os.path.join(results_dir, 'eeg_mxl_epochs_%d-epo.fif' %
+                             run_idx), verbose=True)
+    epochs_shift.save(os.path.join(results_dir, 'eeg_mxl_epochs_%d-eposhift.fif' %
                                    run_idx), verbose=True)
