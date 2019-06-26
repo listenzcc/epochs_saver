@@ -17,7 +17,7 @@ import matplotlib.pyplot as plt
 # Output: id_string, customer identifier string.
 # Output: results_dir, directory for storing results.
 '''
-root_dir = os.path.join('D:\\', 'RSVP_MEG_experiment')
+root_dir = os.path.join('/nfs/cell_a/userhome/zcc/documents', 'RSVP_experiment')
 time_stamp = time.strftime('%Y-%m-%d-%H-%M-%S')
 results_dir = os.path.join(root_dir, 'epochs_saver', 'epochs')
 if not os.path.exists(results_dir):
@@ -26,9 +26,9 @@ if not os.path.exists(results_dir):
 '''
 # Function: Reading raw_files.
 '''
-file_dir = os.path.join(root_dir, 'rawdata', '20190402_RSVP_EEG_maxuelin',
-                        'mxl%d.cnt')
-freq_l, freq_h = 0.1, 7  # Hz
+file_dir = os.path.join('/nfs/diskstation/zccdata/RSVP_data/rawdata',
+        '20190402_RSVP_EEG_maxuelin', 'mxl%d.cnt')
+freq_l, freq_h = 0.5, 30  # Hz
 fir_design = 'firwin'
 
 '''
